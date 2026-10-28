@@ -15,12 +15,8 @@ export class LoginPage extends BasePage {
     this.passwordInput = page.locator('[data-test="password"]');
     this.loginButton = page.locator('[data-test="login-button"]');
     this.errorMessage = page.locator('[data-test="error"]');
-    this.usernameErrorMark = page.locator(
-      '.form_group:has([data-test="username"]) .error_icon',
-    );
-    this.passwordErrorMark = page.locator(
-      '.form_group:has([data-test="password"]) .error_icon',
-    );
+    this.usernameErrorMark = page.locator('.form_group:has([data-test="username"]) .error_icon');
+    this.passwordErrorMark = page.locator('.form_group:has([data-test="password"]) .error_icon');
   }
 
   /**

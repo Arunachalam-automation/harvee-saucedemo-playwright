@@ -8,7 +8,13 @@
     "test:sanity": "playwright test --grep @sanity",
     "test:regression": "playwright test --grep @regression",
     "test:e2e": "playwright test --grep @e2e",
-    "report": "playwright show-report build/html-report"
+    "report": "playwright show-report build/html-report",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,js,mjs,cjs,json,md,yml,yaml}": "prettier --write"
   },
   "keywords": [
     "playwright",
@@ -23,6 +29,9 @@
     "@playwright/test": "^1.64.1",
     "@types/node": "^26.6.5",
     "dotenv": "^18.0.9",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.9.10",
     "typescript": "^7.0.2"
   }
 }

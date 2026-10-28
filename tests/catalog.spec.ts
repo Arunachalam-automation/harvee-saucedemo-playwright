@@ -1,7 +1,9 @@
 import { expect, test } from '../fixtures/test-fixtures';
 
 test.describe('Catalog', () => {
-  test('Verify the products can be sorted by price from low to high and from high to low', { tag: ['@TC07', '@regression'] },
+  test(
+    'Verify the products can be sorted by price from low to high and from high to low',
+    { tag: ['@TC07', '@regression'] },
     async ({ productsPage }) => {
       await productsPage.goto();
       await expect(productsPage.inventoryItems.first()).toBeVisible();
@@ -26,6 +28,6 @@ test.describe('Catalog', () => {
       await test.step('Verify the full order price is shown from high to low', async () => {
         await productsPage.expectPricesSorted('descending');
       });
-    },
+    }
   );
 });

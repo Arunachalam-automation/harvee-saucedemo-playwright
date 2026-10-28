@@ -17,28 +17,28 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   reporter: [
     ['html', { outputFolder: 'build/html-report', open: 'never' }],
-    ['junit', { outputFile: 'build/junit/results.xml' }],
+    ['junit', { outputFile: 'build/junit/results.xml' }]
   ],
   use: {
     baseURL: env.baseURL,
     testIdAttribute: 'data-test',
     screenshot: 'only-on-failure',
-    trace: 'retain-on-failure',
+    trace: 'retain-on-failure'
   },
   projects: [
     {
       name: 'setup',
-      testMatch: /auth\.setup\.ts/,
+      testMatch: /auth\.setup\.ts/
     },
     {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
         // Written by tests/auth.setup.ts in the next implementation step
-        storageState: '.auth/user.json',
+        storageState: '.auth/user.json'
       },
       dependencies: ['setup'],
-      testIgnore: /auth\.setup\.ts/,
-    },
-  ],
+      testIgnore: /auth\.setup\.ts/
+    }
+  ]
 });

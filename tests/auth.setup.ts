@@ -17,13 +17,13 @@ setup('authenticate as standard user', async ({ page }) => {
 
   await expect(
     inventory.or(loginError),
-    'Login did not reach the inventory page or show a login error. Check BASE_URL and network access. Storage state was not saved.',
+    'Login did not reach the inventory page or show a login error. Check BASE_URL and network access. Storage state was not saved.'
   ).toBeVisible();
 
   if (await loginError.isVisible()) {
     const message = (await loginError.innerText()).trim();
     throw new Error(
-      `Authentication failed for the configured STANDARD_USER. SauceDemo reported: "${message}". Storage state was not saved. Check BASE_URL, STANDARD_USER, and USER_PASSWORD in .env.`,
+      `Authentication failed for the configured STANDARD_USER. SauceDemo reported: "${message}". Storage state was not saved. Check BASE_URL, STANDARD_USER, and USER_PASSWORD in .env.`
     );
   }
 

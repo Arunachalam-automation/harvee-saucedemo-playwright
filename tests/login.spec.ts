@@ -4,7 +4,9 @@ import { expect, test } from '../fixtures/test-fixtures';
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test.describe('Login', () => {
-  test('Verify the Valid user logs in and the products page is shown',{ tag: ['@TC01', '@smoke', '@e2e', '@regression'] },
+  test(
+    'Verify the Valid user logs in and the products page is shown',
+    { tag: ['@TC01', '@smoke', '@e2e', '@regression'] },
     async ({ loginPage, page }) => {
       await test.step('Hit the application URL', async () => {
         await loginPage.goto();
@@ -53,12 +55,13 @@ test.describe('Login', () => {
           expect(await prices.nth(index).textContent()).not.toBeNull();
         }
       });
-    },
+    }
   );
 
-  test('Verify the invalid user credentials unable to login',{ tag: ['@TC02', '@sanity', '@regression'] },
+  test(
+    'Verify the invalid user credentials unable to login',
+    { tag: ['@TC02', '@sanity', '@regression'] },
     async ({ loginPage, page }) => {
-
       const lockedOutError = 'Epic sadface: Sorry, this user has been locked out.';
 
       await test.step('Hit the application URL', async () => {
@@ -102,12 +105,13 @@ test.describe('Login', () => {
         await expect(page.getByTestId('inventory-item')).toHaveCount(0);
         await expect(page.getByTestId('title')).toHaveCount(0);
       });
-    },
+    }
   );
 
-  test('Verify the valid user is not logged in with an invalid password', { tag: ['@TC03', '@sanity', '@regression'] },
+  test(
+    'Verify the valid user is not logged in with an invalid password',
+    { tag: ['@TC03', '@sanity', '@regression'] },
     async ({ loginPage, page }) => {
-      
       const invalidPassword = 'testing_invalid_password';
       const mismatchError = 'Epic sadface: Username and password do not match any user in this service';
 
@@ -146,6 +150,6 @@ test.describe('Login', () => {
         await expect(page.getByTestId('inventory-item')).toHaveCount(0);
         await expect(page.getByTestId('title')).toHaveCount(0);
       });
-    },
+    }
   );
 });

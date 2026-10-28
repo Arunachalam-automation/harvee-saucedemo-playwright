@@ -1,0 +1,11 @@
+# Align editors with Prettier defaults for this repo.
+# See https://prettier.io/docs/configuration#editorconfig
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+end_of_line = lf
+indent_style = space
+indent_size = 2
+max_line_length = 120

@@ -8,6 +8,9 @@ export class ProductsPage extends BasePage {
   readonly prices: Locator;
   readonly addToCartButtons: Locator;
   readonly sortProducts: Locator;
+  readonly shoppingCartLink: Locator;
+  readonly cartBadge: Locator;
+  readonly title: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -17,6 +20,9 @@ export class ProductsPage extends BasePage {
     this.prices = page.locator('[data-test="inventory-item-price"]');
     this.addToCartButtons = page.getByRole('button', { name: 'Add to cart', exact: true });
     this.sortProducts = page.getByRole('combobox', { name: 'Sort products' });
+    this.shoppingCartLink = page.getByTestId('shopping-cart-link');
+    this.cartBadge = page.getByTestId('shopping-cart-badge');
+    this.title = page.getByTestId('title');
   }
 
   /**
@@ -24,6 +30,26 @@ export class ProductsPage extends BasePage {
    */
   async goto(): Promise<void> {
     await this.page.goto('/inventory.html');
+  }
+
+  /**
+   * Returns the inventory card for a product by its visible name.
+   * @param productName - The product name shown on the card.
+   */
+  productCard(productName: string): Locator {
+    return this.inventoryItems.filter({
+      has: this.page.getByTestId('inventory-item-name').filter({ hasText: productName })
+    });
+  }
+
+  /**
+   * Returns the Add to cart / Remove button for a product card.
+   * @param productName - The product name shown on the card.
+   */
+  productActionButton(productName: string): Locator {
+    return this.productCard(productName).getByRole('button', {
+      name: /^(Add to cart|Remove)$/
+    });
   }
 
   /**
@@ -68,10 +94,56 @@ export class ProductsPage extends BasePage {
       expect(prices).toHaveLength(itemCount);
       expect(prices.length).toBeGreaterThan(0);
 
-      const sorted = [...prices].sort((left, right) =>
-        direction === 'ascending' ? left - right : right - left,
-      );
+      const sorted = [...prices].sort((left, right) => (direction === 'ascending' ? left - right : right - left));
       expect(prices).toEqual(sorted);
     }).toPass();
+  }
+
+  /**
+   * Returns the price text shown on a product card.
+   * @param productName - The product name shown on the card.
+   */
+  async getProductPrice(productName: string): Promise<string> {
+    return (await this.productCard(productName).getByTestId('inventory-item-price').innerText()).trim();
+  }
+
+  /**
+   * Clicks Add to cart on the named product.
+   * @param productName - The product to add.
+   */
+  async addToCart(productName: string): Promise<void> {
+    await this.productCard(productName).getByRole('button', { name: 'Add to cart', exact: true }).click();
+  }
+
+  /**
+   * Clicks Remove on the named product.
+   * @param productName - The product to remove from the cart.
+   */
+  async removeFromCart(productName: string): Promise<void> {
+    await this.productCard(productName).getByRole('button', { name: 'Remove', exact: true }).click();
+  }
+
+  /**
+   * Opens the shopping cart from the header link.
+   */
+  async openCart(): Promise<void> {
+    await this.shoppingCartLink.click();
+  }
+
+  /**
+   * Verifies the cart badge shows the expected item count.
+   * @param count - The expected badge number.
+   */
+  async expectCartBadgeCount(count: number): Promise<void> {
+    await expect(this.cartBadge).toHaveText(String(count));
+  }
+
+  /**
+   * Verifies the product card action button shows the expected label.
+   * @param productName - The product name shown on the card.
+   * @param label - The expected button label, Add to cart or Remove.
+   */
+  async expectProductButtonLabel(productName: string, label: 'Add to cart' | 'Remove'): Promise<void> {
+    await expect(this.productActionButton(productName)).toHaveText(label);
   }
 }

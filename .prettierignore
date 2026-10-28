@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build / reports / Playwright artifacts
+build/
+dist/
+coverage/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Auth / secrets / generated state
+.auth/
+**/*.storage-state.json
+**/auth*.json
+**/storageState*.json
+.env
+.env.*
+
+# Lockfiles (keep deterministic formatting)
+package-lock.json
+
+# Agent / skill vendor content
+.agents/
+skills-lock.json
+
+# Binary / non-source
+*.xlsx
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.zip
+*.tgz

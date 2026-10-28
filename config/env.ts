@@ -8,8 +8,7 @@ function requireEnv(name: string): string {
 
   if (value === undefined || value.trim() === '') {
     throw new Error(
-      `Missing required environment variable: ${name}. ` +
-        `Copy .env.example to .env and provide a value for ${name}.`,
+      `Missing required environment variable: ${name}. ` + `Copy .env.example to .env and provide a value for ${name}.`
     );
   }
 
@@ -24,5 +23,5 @@ export const env = {
   baseURL: requireEnv('BASE_URL'),
   standardUser: requireEnv('STANDARD_USER'),
   lockedUser: requireEnv('LOCKED_USER'),
-  userPassword: requireEnv('USER_PASSWORD'),
+  userPassword: requireEnv('USER_PASSWORD')
 } as const;

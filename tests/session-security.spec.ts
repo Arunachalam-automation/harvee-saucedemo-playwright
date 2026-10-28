@@ -4,9 +4,10 @@ import { expect, test } from '../fixtures/test-fixtures';
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test.describe('Session', () => {
-  test('Verify a logged out user cannot open the Products page by its URL',{ tag: ['@TC19', '@sanity', '@regression'] },
+  test(
+    'Verify a logged out user cannot open the Products page by its URL',
+    { tag: ['@TC19', '@sanity', '@regression'] },
     async ({ loginPage, productsPage, page }) => {
-
       const accessError = "Epic sadface: You can only access '/inventory.html' when you are logged in.";
 
       await test.step('Log in with valid credentials, then click Logout', async () => {
@@ -43,6 +44,6 @@ test.describe('Session', () => {
         await expect(productsPage.prices).toHaveCount(0);
         await expect(productsPage.addToCartButtons).toHaveCount(0);
       });
-    },
+    }
   );
 });
