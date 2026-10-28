@@ -4,11 +4,11 @@ import { env } from './config/env';
 /**
  * SauceDemo Playwright configuration.
  *
- * Suite selection (smoke / regression / E2E) is driven by npm scripts via
- * `--grep` tags (@smoke, @regression, @e2e), not by separate projects.
+ * Suite selection (smoke / regression / E2E / Sanity) is driven by npm scripts via
+ * `--grep` tags (@smoke, @regression, @e2e, @sanity), not by separate projects.
  *
- * The `setup` project is wired for `tests/auth.setup.ts` (created in a later
- * step). Until that file and its storage state exist, test runs will not succeed.
+ * The `setup` project is wired for `tests/auth.setup.ts` .
+ * Until that file and its storage state exist, test runs will not succeed.
  */
 export default defineConfig({
   testDir: './tests',

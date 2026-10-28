@@ -14,7 +14,7 @@ export class BasePage {
 
   /**
    * Opens a path on the configured BASE_URL.
-   * Defaults to the application root.
+   * @param path - The path to open. Defaults to the application root.
    */
   async goto(path = '/'): Promise<void> {
     const base = env.baseURL.endsWith('/') ? env.baseURL : `${env.baseURL}/`;
