@@ -5,6 +5,7 @@
   "scripts": {
     "test": "playwright test",
     "test:smoke": "playwright test --grep @smoke",
+    "test:sanity": "playwright test --grep @sanity",
     "test:regression": "playwright test --grep @regression",
     "test:e2e": "playwright test --grep @e2e",
     "report": "playwright show-report build/html-report"
