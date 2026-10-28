@@ -16,8 +16,12 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   reporter: [
+    // Explicit list reporter: Playwright otherwise injects `line` (TTY single-line \r updates),
+    // which overwrites "[n/m] setup" progress and looks broken with test.only / short runs.
+    ['list'],
     ['html', { outputFolder: 'build/html-report', open: 'never' }],
-    ['junit', { outputFile: 'build/junit/results.xml' }]
+    ['junit', { outputFile: 'build/junit/results.xml' }],
+    ['./reporters/console-summary-reporter.ts']
   ],
   use: {
     baseURL: env.baseURL,

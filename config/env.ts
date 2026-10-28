@@ -1,7 +1,9 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+// quiet: true suppresses dotenv's "injected env" banner; values still load normally.
+// Playwright workers re-import this module, so without quiet the banner repeats per process.
+dotenv.config({ path: path.resolve(__dirname, '..', '.env'), quiet: true });
 
 function requireEnv(name: string): string {
   const value = process.env[name];
