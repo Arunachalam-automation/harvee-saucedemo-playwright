@@ -1,21 +1,26 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { BasePage } from './BasePage';
+import { ProductsPage } from './ProductsPage';
 
 export class CartPage extends BasePage {
   readonly title: Locator;
   readonly cartItems: Locator;
   readonly continueShoppingButton: Locator;
+  readonly checkoutButton: Locator;
   readonly cartBadge: Locator;
+  private readonly productsPage: ProductsPage;
 
   constructor(page: Page) {
     super(page);
-    this.title = page.getByTestId('title');
-    this.cartItems = page.locator('[data-test="inventory-item"]');
+    this.productsPage = new ProductsPage(page);
+    this.title = this.productsPage.title;
+    this.cartItems = this.productsPage.inventoryItems;
+    this.cartBadge = this.productsPage.cartBadge;
     this.continueShoppingButton = page.getByRole('button', {
       name: 'Continue Shopping',
       exact: true
     });
-    this.cartBadge = page.getByTestId('shopping-cart-badge');
+    this.checkoutButton = page.getByRole('button', { name: 'Checkout', exact: true });
   }
 
   /**
@@ -40,6 +45,27 @@ export class CartPage extends BasePage {
    */
   async continueShopping(): Promise<void> {
     await this.continueShoppingButton.click();
+  }
+
+  /**
+   * Clicks Checkout to open Checkout: Your Information.
+   */
+  async checkout(): Promise<void> {
+    await this.checkoutButton.click();
+  }
+
+  /**
+   * Verifies the cart has no product lines.
+   */
+  async expectNoProductLines(): Promise<void> {
+    await expect(this.cartItems).toHaveCount(0);
+  }
+
+  /**
+   * Verifies the cart badge is gone.
+   */
+  async expectCartBadgeGone(): Promise<void> {
+    await this.productsPage.expectCartBadgeGone();
   }
 
   /**
@@ -84,6 +110,6 @@ export class CartPage extends BasePage {
    * @param count - The expected badge number.
    */
   async expectCartBadgeCount(count: number): Promise<void> {
-    await expect(this.cartBadge).toHaveText(String(count));
+    await this.productsPage.expectCartBadgeCount(count);
   }
 }

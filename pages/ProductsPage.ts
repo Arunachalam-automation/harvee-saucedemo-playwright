@@ -139,6 +139,13 @@ export class ProductsPage extends BasePage {
   }
 
   /**
+   * Verifies the cart badge is gone.
+   */
+  async expectCartBadgeGone(): Promise<void> {
+    await expect(this.cartBadge).toHaveCount(0);
+  }
+
+  /**
    * Verifies the product card action button shows the expected label.
    * @param productName - The product name shown on the card.
    * @param label - The expected button label, Add to cart or Remove.
