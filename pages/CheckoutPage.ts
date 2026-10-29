@@ -42,9 +42,18 @@ export class CheckoutPage extends BasePage {
     this.continueButton = page.getByRole('button', { name: 'Continue', exact: true });
     this.finishButton = page.getByRole('button', { name: 'Finish', exact: true });
     this.errorDismissButton = page.getByTestId('error-button');
-    this.firstNameErrorMark = page.locator('.form_group:has([data-test="firstName"]) .error_icon');
-    this.lastNameErrorMark = page.locator('.form_group:has([data-test="lastName"]) .error_icon');
-    this.postalCodeErrorMark = page.locator('.form_group:has([data-test="postalCode"]) .error_icon');
+    this.firstNameErrorMark = page
+      .locator('.form_group')
+      .filter({ has: page.getByTestId('firstName') })
+      .locator('.error_icon');
+    this.lastNameErrorMark = page
+      .locator('.form_group')
+      .filter({ has: page.getByTestId('lastName') })
+      .locator('.error_icon');
+    this.postalCodeErrorMark = page
+      .locator('.form_group')
+      .filter({ has: page.getByTestId('postalCode') })
+      .locator('.error_icon');
     this.paymentInfoValue = page.getByTestId('payment-info-value');
     this.shippingInfoValue = page.getByTestId('shipping-info-value');
     this.itemTotalLabel = page.getByTestId('subtotal-label');

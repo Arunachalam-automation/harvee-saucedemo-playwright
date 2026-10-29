@@ -16,8 +16,8 @@ export class ProductsPage extends BasePage {
     super(page);
     this.openMenuButton = page.getByRole('button', { name: 'Open Menu' });
     this.logoutButton = page.getByRole('button', { name: 'Logout' });
-    this.inventoryItems = page.locator('[data-test="inventory-item"]');
-    this.prices = page.locator('[data-test="inventory-item-price"]');
+    this.inventoryItems = page.getByTestId('inventory-item');
+    this.prices = page.getByTestId('inventory-item-price');
     this.addToCartButtons = page.getByRole('button', { name: 'Add to cart', exact: true });
     this.sortProducts = page.getByRole('combobox', { name: 'Sort products' });
     this.shoppingCartLink = page.getByTestId('shopping-cart-link');
