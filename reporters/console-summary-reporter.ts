@@ -190,32 +190,11 @@ class ConsoleSummaryReporter implements Reporter {
   }
 
   /**
-   * Formats configured report artifact paths from the current Playwright config.
+   * Prints a single open-report command for every run (browser, grep, file, etc.).
+   * The custom HTML report is written to build/html-report after the run.
    */
   private buildArtifactsSection(): string[] {
-    const config = this.config!;
-    const htmlPath = findReporterOutput(config, 'html', 'outputFolder') ?? 'Not configured';
-    const jsonPath = findReporterOutput(config, 'json', 'outputFile') ?? 'Not configured';
-    const junitPath = findReporterOutput(config, 'junit', 'outputFile');
-    const traceLocation = resolveOutputDir(config);
-
-    const lines = [
-      DASH,
-      'REPORT ARTIFACTS',
-      DASH,
-      formatField('HTML Report', htmlPath),
-      formatField('JSON Report', jsonPath)
-    ];
-
-    if (junitPath) {
-      lines.push(formatField('JUnit Report', junitPath));
-    }
-
-    lines.push(
-      formatField('Traces', traceLocation === 'Not configured' ? traceLocation : `${traceLocation} (retain-on-failure)`)
-    );
-    lines.push('');
-    return lines;
+    return [DASH, 'REPORT ARTIFACTS', DASH, 'Open report: npm run report', ''];
   }
 }
 
@@ -333,7 +312,7 @@ function buildFailureSection(failures: FailedTestInfo[], failed: number, flaky: 
   }
 
   if (flaky > 0) {
-    lines.push(`Flaky (recovered) tests: ${flaky} — see HTML report for details`);
+    lines.push(`Flaky (recovered) tests: ${flaky} — see custom HTML report for details`);
     lines.push('');
   }
 
@@ -410,43 +389,6 @@ function resolveExecutionMode(config: FullConfig): string {
   }
   // Playwright sets headless=false when --headed is passed.
   return target.use.headless === false ? 'headed' : 'headless';
-}
-
-/**
- * Locates a built-in reporter option value from the resolved reporter list.
- * @param config Resolved Playwright full configuration.
- * @param reporterName Built-in reporter id (html, json, junit, ...).
- * @param optionKey Option key to read (outputFolder or outputFile).
- */
-function findReporterOutput(
-  config: FullConfig,
-  reporterName: string,
-  optionKey: 'outputFolder' | 'outputFile'
-): string | undefined {
-  for (const entry of config.reporter) {
-    const name = entry[0];
-    const options = (entry[1] ?? {}) as Record<string, unknown>;
-    const normalized = path.basename(String(name)).replace(/\.(js|ts|cjs|mjs)$/i, '');
-    if (name === reporterName || normalized === reporterName) {
-      const value = options[optionKey];
-      if (typeof value === 'string' && value.trim() !== '') {
-        return toRelativePath(path.resolve(value));
-      }
-    }
-  }
-  return undefined;
-}
-
-/**
- * Resolves the test output directory used for traces, screenshots, and videos.
- * @param config Resolved Playwright full configuration.
- */
-function resolveOutputDir(config: FullConfig): string {
-  const fromProject = config.projects.find((p) => !!p.outputDir)?.outputDir;
-  if (fromProject) {
-    return toRelativePath(fromProject);
-  }
-  return 'Not configured';
 }
 
 /**
