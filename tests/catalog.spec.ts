@@ -1,4 +1,5 @@
 import { expect, test } from '../fixtures/test-fixtures';
+import productSortOptions from '../test-data/products/sort-options.json';
 
 test.describe('Catalog', () => {
   test(
@@ -14,7 +15,7 @@ test.describe('Catalog', () => {
       });
 
       await test.step('Choose Price (low to high)', async () => {
-        await productsPage.sortBy('Price (low to high)');
+        await productsPage.sortBy(productSortOptions.priceLowToHigh);
       });
 
       await test.step('Verify the full order price is shown from low to high', async () => {
@@ -22,7 +23,7 @@ test.describe('Catalog', () => {
       });
 
       await test.step('Choose Price (high to low)', async () => {
-        await productsPage.sortBy('Price (high to low)');
+        await productsPage.sortBy(productSortOptions.priceHighToLow);
       });
 
       await test.step('Verify the full order price is shown from high to low', async () => {

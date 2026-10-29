@@ -1,14 +1,17 @@
 import { expect, test } from '../fixtures/test-fixtures';
-
-const productA = 'Sauce Labs Backpack';
-const firstName = 'Arunachalam';
-const lastName = 'Loganathan';
+import cartItems from '../test-data/cart/items.json';
+import checkoutCustomer from '../test-data/checkout/customer.json';
+import checkoutMessages from '../test-data/checkout/messages.json';
+import checkoutShipping from '../test-data/checkout/shipping.json';
 
 test.describe('Checkout', () => {
   test(
     'Verify checkout shows an error when first name, last name, or postal code is missing',
     { tag: ['@TC13', '@regression'] },
     async ({ productsPage, cartPage, checkoutPage }) => {
+      const { productA } = cartItems;
+      const { firstName, lastName } = checkoutCustomer;
+
       await test.step('Open the Products page', async () => {
         await productsPage.goto();
         await expect(productsPage.inventoryItems.first()).toBeVisible();
@@ -34,7 +37,7 @@ test.describe('Checkout', () => {
       });
 
       await test.step('Verify the error Error: First Name is required and the page stays on Checkout: Your Information', async () => {
-        await checkoutPage.expectErrorMessage('Error: First Name is required');
+        await checkoutPage.expectErrorMessage(checkoutMessages.firstNameRequired);
         await checkoutPage.expectYourInformationHeading();
       });
 
@@ -44,7 +47,7 @@ test.describe('Checkout', () => {
       });
 
       await test.step('Verify the error Error: Last Name is required', async () => {
-        await checkoutPage.expectErrorMessage('Error: Last Name is required');
+        await checkoutPage.expectErrorMessage(checkoutMessages.lastNameRequired);
       });
 
       await test.step('Enter Last Name and Leave Zip/Postal Code empty. Click Continue', async () => {
@@ -53,7 +56,7 @@ test.describe('Checkout', () => {
       });
 
       await test.step('Verify the error Error: Postal Code is required', async () => {
-        await checkoutPage.expectErrorMessage('Error: Postal Code is required');
+        await checkoutPage.expectErrorMessage(checkoutMessages.postalCodeRequired);
       });
 
       await test.step('Verify First Name, Last Name, and Zip/Postal Code all show the red error mark, including the filled fields', async () => {
@@ -79,9 +82,8 @@ test.describe('Checkout', () => {
     'Verify a full checkout totals the item price plus tax and then empties the cart',
     { tag: ['@TC14', '@smoke', '@e2e', '@regression'] },
     async ({ productsPage, cartPage, checkoutPage }) => {
-      const productB = 'Sauce Labs Bike Light';
-      const postalCode = '641046';
-      const deliveryPartner = 'Free Pony Express Delivery!';
+      const { productA, productB } = cartItems;
+      const { firstName, lastName, postalCode } = checkoutCustomer;
 
       await productsPage.goto();
       await expect(productsPage.inventoryItems.first()).toBeVisible();
@@ -123,7 +125,7 @@ test.describe('Checkout', () => {
       });
 
       await test.step('Verify Shipping Information is the delivery partner', async () => {
-        await checkoutPage.expectShippingInformation(deliveryPartner);
+        await checkoutPage.expectShippingInformation(checkoutShipping.deliveryPartner);
       });
 
       await test.step('Verify Item total', async () => {

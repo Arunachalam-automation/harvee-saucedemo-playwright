@@ -1,12 +1,12 @@
 import { expect, test } from '../fixtures/test-fixtures';
+import cartItems from '../test-data/cart/items.json';
 
 test.describe('Cart', () => {
   test(
     'Verify adding two items and removing one updates the cart badge and the cart',
     { tag: ['@TC09', '@smoke', '@e2e', '@regression'] },
     async ({ productsPage, cartPage }) => {
-      const productA = 'Sauce Labs Backpack';
-      const productB = 'Sauce Labs Bike Light';
+      const { productA, productB } = cartItems;
 
       await productsPage.goto();
       await expect(productsPage.inventoryItems.first()).toBeVisible();

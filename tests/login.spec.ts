@@ -1,5 +1,6 @@
-import { env } from '../config/env';
 import { expect, test } from '../fixtures/test-fixtures';
+import authMessages from '../test-data/auth/messages.json';
+import authUsers from '../test-data/auth/users.json';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -13,7 +14,7 @@ test.describe('Login', () => {
       });
 
       await test.step('Validate the heading Swag Labs', async () => {
-        await expect(page.getByText('Swag Labs', { exact: true })).toBeVisible();
+        await expect(page.getByText(authMessages.appHeading, { exact: true })).toBeVisible();
       });
 
       await test.step('Validate Username, Password, and Login', async () => {
@@ -26,7 +27,10 @@ test.describe('Login', () => {
       });
 
       await test.step('Enter the valid username and password', async () => {
-        await loginPage.enterCredentials(env.standardUser, env.userPassword);
+        await loginPage.enterCredentials(
+          process.env.STANDARD_USER || authUsers.standard.username,
+          process.env.USER_PASSWORD || authUsers.standard.password
+        );
       });
 
       await test.step('Click the Login button', async () => {
@@ -62,14 +66,12 @@ test.describe('Login', () => {
     'Verify the invalid user credentials unable to login',
     { tag: ['@TC02', '@sanity', '@regression'] },
     async ({ loginPage, page }) => {
-      const lockedOutError = 'Epic sadface: Sorry, this user has been locked out.';
-
       await test.step('Hit the application URL', async () => {
         await loginPage.goto();
       });
 
       await test.step('Validate the heading, fields, and Login button', async () => {
-        await expect(page.getByText('Swag Labs', { exact: true })).toBeVisible();
+        await expect(page.getByText(authMessages.appHeading, { exact: true })).toBeVisible();
         await expect(loginPage.usernameInput).toBeVisible();
         await expect(loginPage.usernameInput).toHaveAttribute('placeholder', 'Username');
         await expect(loginPage.passwordInput).toBeVisible();
@@ -79,7 +81,10 @@ test.describe('Login', () => {
       });
 
       await test.step('Enter the locked-out username and valid password', async () => {
-        await loginPage.enterCredentials(env.lockedUser, env.userPassword);
+        await loginPage.enterCredentials(
+          process.env.LOCKED_USER || authUsers.locked.username,
+          process.env.USER_PASSWORD || authUsers.locked.password
+        );
       });
 
       await test.step('Click the Login button', async () => {
@@ -87,12 +92,12 @@ test.describe('Login', () => {
       });
 
       await test.step('Verify the locked-out error message', async () => {
-        await expect(loginPage.errorMessage).toContainText(lockedOutError);
+        await expect(loginPage.errorMessage).toContainText(authMessages.lockedOut);
       });
 
       await test.step('Verify the typed values and red error marks remain', async () => {
-        await expect(loginPage.usernameInput).toHaveValue(env.lockedUser);
-        await expect(loginPage.passwordInput).toHaveValue(env.userPassword);
+        await expect(loginPage.usernameInput).toHaveValue(authUsers.locked.username);
+        await expect(loginPage.passwordInput).toHaveValue(authUsers.locked.password);
         await expect(loginPage.usernameInput).toHaveClass(/input_error/);
         await expect(loginPage.passwordInput).toHaveClass(/input_error/);
         await expect(loginPage.usernameErrorMark).toBeVisible();
@@ -112,19 +117,16 @@ test.describe('Login', () => {
     'Verify the valid user is not logged in with an invalid password',
     { tag: ['@TC03', '@sanity', '@regression'] },
     async ({ loginPage, page }) => {
-      const invalidPassword = 'testing_invalid_password';
-      const mismatchError = 'Epic sadface: Username and password do not match any user in this service';
-
       await test.step('Hit the application URL', async () => {
         await loginPage.goto();
       });
 
       await test.step('Enter the valid username', async () => {
-        await loginPage.enterUsername(env.standardUser);
+        await loginPage.enterUsername(process.env.STANDARD_USER || authUsers.standard.username);
       });
 
       await test.step('Enter the invalid password', async () => {
-        await loginPage.enterPassword(invalidPassword);
+        await loginPage.enterPassword(authUsers.invalidPassword);
       });
 
       await test.step('Click the Login button', async () => {
@@ -132,12 +134,12 @@ test.describe('Login', () => {
       });
 
       await test.step('Verify the credential mismatch error message', async () => {
-        await expect(loginPage.errorMessage).toContainText(mismatchError);
+        await expect(loginPage.errorMessage).toContainText(authMessages.credentialMismatch);
       });
 
       await test.step('Verify both fields keep the typed values and show the red error mark', async () => {
-        await expect(loginPage.usernameInput).toHaveValue(env.standardUser);
-        await expect(loginPage.passwordInput).toHaveValue(invalidPassword);
+        await expect(loginPage.usernameInput).toHaveValue(process.env.STANDARD_USER || authUsers.standard.username);
+        await expect(loginPage.passwordInput).toHaveValue(authUsers.invalidPassword);
         await expect(loginPage.usernameInput).toHaveClass(/input_error/);
         await expect(loginPage.passwordInput).toHaveClass(/input_error/);
         await expect(loginPage.usernameErrorMark).toBeVisible();
