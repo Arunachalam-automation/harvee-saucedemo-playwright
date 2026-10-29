@@ -1,9 +1,8 @@
 import { type Page } from '@playwright/test';
-import { env } from '../config/env';
 
 /**
  * Shared navigation for page objects.
- * Routes are resolved against BASE_URL from config/env.ts.
+ * Paths are resolved against Playwright `use.baseURL` (from `process.env.BASE_URL`).
  */
 export class BasePage {
   protected readonly page: Page;
@@ -13,11 +12,10 @@ export class BasePage {
   }
 
   /**
-   * Opens a path on the configured BASE_URL.
+   * Opens a path relative to the configured base URL.
    * @param path - The path to open. Defaults to the application root.
    */
   async goto(path = '/'): Promise<void> {
-    const base = env.baseURL.endsWith('/') ? env.baseURL : `${env.baseURL}/`;
-    await this.page.goto(new URL(path, base).href);
+    await this.page.goto(path);
   }
 }

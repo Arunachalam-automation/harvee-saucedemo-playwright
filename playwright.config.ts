@@ -1,5 +1,13 @@
 import { defineConfig, devices } from '@playwright/test';
-import { env } from './config/env';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// quiet: true suppresses dotenv's "injected env" banner; values still load normally.
+// Playwright workers re-import this module, so without quiet the banner repeats per process.
+dotenv.config({ path: path.resolve(__dirname, '.env'), quiet: true });
+
+/** Default SauceDemo origin when BASE_URL is missing or blank. */
+const DEFAULT_BASE_URL = 'https://www.saucedemo.com';
 
 /**
  * Shared settings for every browser project that depends on auth setup.
@@ -44,7 +52,7 @@ export default defineConfig({
     ['./reporters/console-summary-reporter.ts']
   ],
   use: {
-    baseURL: env.baseURL,
+    baseURL: process.env.BASE_URL || DEFAULT_BASE_URL,
     testIdAttribute: 'data-test',
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure'
