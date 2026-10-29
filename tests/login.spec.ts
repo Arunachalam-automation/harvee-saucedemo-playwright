@@ -1,8 +1,6 @@
-import { expect, test } from '../fixtures/test-fixtures';
+import { expect, testNoAuth as test } from '../fixtures/test-fixtures';
 import authMessages from '../test-data/auth/messages.json';
 import authUsers from '../test-data/auth/users.json';
-
-test.use({ storageState: { cookies: [], origins: [] } });
 
 test.describe('Login', () => {
   test(
