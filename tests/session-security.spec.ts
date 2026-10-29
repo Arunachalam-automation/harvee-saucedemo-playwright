@@ -1,5 +1,4 @@
 import { expect, testNoAuth as test } from '../fixtures/test-fixtures';
-import authMessages from '../test-data/auth/messages.json';
 import authUsers from '../test-data/auth/users.json';
 import sessionSecurityMessages from '../test-data/session-security/messages.json';
 
@@ -20,7 +19,7 @@ test.describe('Session', () => {
 
       await test.step('Verify the user is logged out and the Login page is shown', async () => {
         await expect(page).toHaveURL(/\/$/);
-        await expect(page.getByText(authMessages.appHeading, { exact: true })).toBeVisible();
+        await expect(loginPage.appHeading).toBeVisible();
         await expect(loginPage.usernameInput).toBeVisible();
         await expect(loginPage.passwordInput).toBeVisible();
         await expect(loginPage.loginButton).toBeVisible();
@@ -32,7 +31,7 @@ test.describe('Session', () => {
 
       await test.step('Verify the browser returns to the Login page', async () => {
         await expect(page).toHaveURL(/\/$/);
-        await expect(page.getByText(authMessages.appHeading, { exact: true })).toBeVisible();
+        await expect(loginPage.appHeading).toBeVisible();
         await expect(loginPage.loginButton).toBeVisible();
       });
 

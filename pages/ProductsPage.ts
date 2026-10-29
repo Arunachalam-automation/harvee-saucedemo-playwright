@@ -4,7 +4,9 @@ import { BasePage } from './BasePage';
 export class ProductsPage extends BasePage {
   readonly openMenuButton: Locator;
   readonly logoutButton: Locator;
+  readonly inventoryContainer: Locator;
   readonly inventoryItems: Locator;
+  readonly productNames: Locator;
   readonly prices: Locator;
   readonly addToCartButtons: Locator;
   readonly sortProducts: Locator;
@@ -16,7 +18,9 @@ export class ProductsPage extends BasePage {
     super(page);
     this.openMenuButton = page.getByRole('button', { name: 'Open Menu' });
     this.logoutButton = page.getByRole('button', { name: 'Logout' });
+    this.inventoryContainer = page.getByTestId('inventory-container');
     this.inventoryItems = page.getByTestId('inventory-item');
+    this.productNames = page.getByTestId('inventory-item-name');
     this.prices = page.getByTestId('inventory-item-price');
     this.addToCartButtons = page.getByRole('button', { name: 'Add to cart', exact: true });
     this.sortProducts = page.getByRole('combobox', { name: 'Sort products' });
@@ -38,7 +42,7 @@ export class ProductsPage extends BasePage {
    */
   productCard(productName: string): Locator {
     return this.inventoryItems.filter({
-      has: this.page.getByTestId('inventory-item-name').filter({ hasText: productName })
+      has: this.productNames.filter({ hasText: productName })
     });
   }
 

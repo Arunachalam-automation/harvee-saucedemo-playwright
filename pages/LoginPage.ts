@@ -2,6 +2,7 @@ import { type Locator, type Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class LoginPage extends BasePage {
+  readonly appHeading: Locator;
   readonly usernameInput: Locator;
   readonly passwordInput: Locator;
   readonly loginButton: Locator;
@@ -11,18 +12,13 @@ export class LoginPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
+    this.appHeading = page.getByText('Swag Labs', { exact: true });
     this.usernameInput = page.getByTestId('username');
     this.passwordInput = page.getByTestId('password');
     this.loginButton = page.getByTestId('login-button');
     this.errorMessage = page.getByTestId('error');
-    this.usernameErrorMark = page
-      .locator('.form_group')
-      .filter({ has: page.getByTestId('username') })
-      .locator('.error_icon');
-    this.passwordErrorMark = page
-      .locator('.form_group')
-      .filter({ has: page.getByTestId('password') })
-      .locator('.error_icon');
+    this.usernameErrorMark = page.locator('.form_group').filter({ has: this.usernameInput }).locator('.error_icon');
+    this.passwordErrorMark = page.locator('.form_group').filter({ has: this.passwordInput }).locator('.error_icon');
   }
 
   /**

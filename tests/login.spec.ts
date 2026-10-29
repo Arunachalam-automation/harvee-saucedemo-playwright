@@ -6,13 +6,13 @@ test.describe('Login', () => {
   test(
     'Verify the Valid user logs in and the products page is shown',
     { tag: ['@TC01', '@smoke', '@e2e', '@regression'] },
-    async ({ loginPage, page }) => {
+    async ({ loginPage, productsPage, page }) => {
       await test.step('Hit the application URL', async () => {
         await loginPage.goto();
       });
 
       await test.step('Validate the heading Swag Labs', async () => {
-        await expect(page.getByText(authMessages.appHeading, { exact: true })).toBeVisible();
+        await expect(loginPage.appHeading).toBeVisible();
       });
 
       await test.step('Validate Username, Password, and Login', async () => {
@@ -41,20 +41,16 @@ test.describe('Login', () => {
       });
 
       await test.step('Verify the Products heading and displayed products', async () => {
-        await expect(page.getByTestId('title')).toHaveText('Products');
+        await expect(productsPage.title).toHaveText('Products');
+        await expect(productsPage.inventoryItems.first()).toBeVisible();
 
-        const products = page.getByTestId('inventory-item');
-        await expect(products.first()).toBeVisible();
-
-        const productCount = await products.count();
-        const names = page.getByTestId('inventory-item-name');
-        const prices = page.getByTestId('inventory-item-price');
-        await expect(names).toHaveCount(productCount);
-        await expect(prices).toHaveCount(productCount);
+        const productCount = await productsPage.inventoryItems.count();
+        await expect(productsPage.productNames).toHaveCount(productCount);
+        await expect(productsPage.prices).toHaveCount(productCount);
 
         for (let index = 0; index < productCount; index += 1) {
-          expect(await names.nth(index).textContent()).not.toBeNull();
-          expect(await prices.nth(index).textContent()).not.toBeNull();
+          expect(await productsPage.productNames.nth(index).textContent()).not.toBeNull();
+          expect(await productsPage.prices.nth(index).textContent()).not.toBeNull();
         }
       });
     }
@@ -63,13 +59,13 @@ test.describe('Login', () => {
   test(
     'Verify the invalid user credentials unable to login',
     { tag: ['@TC02', '@sanity', '@regression'] },
-    async ({ loginPage, page }) => {
+    async ({ loginPage, productsPage, page }) => {
       await test.step('Hit the application URL', async () => {
         await loginPage.goto();
       });
 
       await test.step('Validate the heading, fields, and Login button', async () => {
-        await expect(page.getByText(authMessages.appHeading, { exact: true })).toBeVisible();
+        await expect(loginPage.appHeading).toBeVisible();
         await expect(loginPage.usernameInput).toBeVisible();
         await expect(loginPage.usernameInput).toHaveAttribute('placeholder', 'Username');
         await expect(loginPage.passwordInput).toBeVisible();
@@ -104,9 +100,9 @@ test.describe('Login', () => {
 
       await test.step('Verify the user stays on Login and Products is not shown', async () => {
         await expect(page).toHaveURL(/\/$/);
-        await expect(page.getByTestId('inventory-container')).toHaveCount(0);
-        await expect(page.getByTestId('inventory-item')).toHaveCount(0);
-        await expect(page.getByTestId('title')).toHaveCount(0);
+        await expect(productsPage.inventoryContainer).toHaveCount(0);
+        await expect(productsPage.inventoryItems).toHaveCount(0);
+        await expect(productsPage.title).toHaveCount(0);
       });
     }
   );
@@ -114,7 +110,7 @@ test.describe('Login', () => {
   test(
     'Verify the valid user is not logged in with an invalid password',
     { tag: ['@TC03', '@sanity', '@regression'] },
-    async ({ loginPage, page }) => {
+    async ({ loginPage, productsPage, page }) => {
       await test.step('Hit the application URL', async () => {
         await loginPage.goto();
       });
@@ -146,9 +142,9 @@ test.describe('Login', () => {
 
       await test.step('Verify the user stays on Login and Products is not shown', async () => {
         await expect(page).toHaveURL(/\/$/);
-        await expect(page.getByTestId('inventory-container')).toHaveCount(0);
-        await expect(page.getByTestId('inventory-item')).toHaveCount(0);
-        await expect(page.getByTestId('title')).toHaveCount(0);
+        await expect(productsPage.inventoryContainer).toHaveCount(0);
+        await expect(productsPage.inventoryItems).toHaveCount(0);
+        await expect(productsPage.title).toHaveCount(0);
       });
     }
   );

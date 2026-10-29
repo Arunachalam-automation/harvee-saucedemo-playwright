@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { expect, test as setup } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
+import { ProductsPage } from '../pages/ProductsPage';
 import authUsers from '../test-data/auth/users.json';
 
 /** Matches storageState in playwright.config.ts. */
@@ -9,14 +10,16 @@ const storageStatePath = path.resolve(__dirname, '..', '.auth', 'user.json');
 
 setup('authenticate as standard user', async ({ page }) => {
   const loginPage = new LoginPage(page);
+  const productsPage = new ProductsPage(page);
+
   await loginPage.goto();
   await loginPage.login(
     process.env.STANDARD_USER || authUsers.standard.username,
     process.env.USER_PASSWORD || authUsers.standard.password
   );
 
-  const inventory = page.getByTestId('inventory-container');
-  const loginError = page.getByTestId('error');
+  const inventory = productsPage.inventoryContainer;
+  const loginError = loginPage.errorMessage;
 
   await expect(
     inventory.or(loginError),
