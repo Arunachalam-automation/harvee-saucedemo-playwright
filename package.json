@@ -25,7 +25,6 @@
     "test:sanity": "node scripts/run-with-report.mjs --grep @sanity",
     "test:regression": "node scripts/run-with-report.mjs --grep @regression",
     "test:e2e": "node scripts/run-with-report.mjs --grep @e2e",
-    "test:raw": "playwright test",
     "typecheck": "tsc --noEmit",
     "report": "node scripts/show-report.mjs",
     "report:generate": "node scripts/report/generate-report.mjs",
