@@ -36,8 +36,16 @@ npm run test:chrome
 
 ### Section A confirmed cases (TC01, TC02, TC03, TC07, TC09, TC13, TC14, TC19)
 
+Bash, macOS, and Linux:
+
 ```bash
 npm run test:chromium -- --grep "@TC01|@TC02|@TC03|@TC07|@TC09|@TC13|@TC14|@TC19"
+```
+
+PowerShell. `--%` stops PowerShell parsing, and `^|` keeps the `|` inside the pattern:
+
+```powershell
+npx playwright test --grep --% "@TC01^|@TC02^|@TC03^|@TC07^|@TC09^|@TC13^|@TC14^|@TC19"
 ```
 
 | ID   | Area     | Spec file                        |
@@ -60,7 +68,7 @@ npm run test:regression
 npm run test:e2e
 npm run test:session-security     # session-security.spec.ts on Chromium
 npm run test:chromium -- tests/login.spec.ts
-npm run test:chromium -- --grep @TC14
+npm run test:chromium -- --grep "@TC14"
 ```
 
 ### Discovery helpers
@@ -68,6 +76,7 @@ npm run test:chromium -- --grep @TC14
 ```bash
 npm run test:list
 npm run test:list:chromium
+npm run test:list:obscura
 npm run test:list:session-security
 ```
 
@@ -92,34 +101,50 @@ Artifacts:
 Regenerate HTML from existing JSON without opening a server:
 
 ```bash
-npm run report:generate
+npm run report
 ```
 
 ## Obscura (optional CDP headless)
 
-[Obscura](https://docs.obscura.sh) is an optional headless browser that exposes a Chrome DevTools Protocol (CDP) WebSocket. Playwright connects with `connectOverCDP` instead of launching Chromium itself. Use it when you want stealth/CDP runs; normal `npm test` / `test:chromium` do **not** use Obscura.
+[Obscura](https://docs.obscura.sh) is an optional headless browser. Playwright connects to it with `connectOverCDP` instead of launching Chromium. `npm test` and `npm run test:chromium` do not use it. `npm install` does not install it.
 
-1. Install the Obscura CLI (or run the Docker image).
-2. Start the CDP server (default `ws://127.0.0.1:9222`).
-3. Set `OBSCURA_CDP_URL` in `.env` if the endpoint differs. Set `OBSCURA_CDP_TOKEN` (Bearer, ≥ 32 bytes) when binding a non-loopback host; optional on local loopback.
-4. Run the opt-in scripts below (`--project=obscura`).
+`npm run test:obscura` does the whole run in one command:
+
+1. On the first run, download the official build for this machine into the home directory (`~/.obscura`, which is `%USERPROFILE%\.obscura` on Windows). Later runs reuse that binary.
+2. Start `obscura serve` on the port in `OBSCURA_CDP_URL` (default `ws://127.0.0.1:9222`).
+3. Run the Obscura Playwright project.
+4. Stop the server this command started. A server that was already listening is left running.
+
+| Machine             | Archive                        |
+| ------------------- | ------------------------------ |
+| Windows 64-bit      | `obscura-x86_64-windows.zip`   |
+| macOS Apple Silicon | `obscura-aarch64-macos.tar.gz` |
+| macOS Intel         | `obscura-x86_64-macos.tar.gz`  |
+| Linux 64-bit        | `obscura-x86_64-linux.tar.gz`  |
+| Linux ARM64         | `obscura-aarch64-linux.tar.gz` |
+
+Leave `OBSCURA_CDP_TOKEN` blank for a local server. Set it (Bearer, at least 32 bytes) only when Obscura is bound to a non-loopback host.
+
+Authenticated specs on Chromium, Firefox, and WebKit load `.auth/user.json` with Playwright `storageState`. Obscura does not implement `Network.setBypassServiceWorker`, so those specs restore the same file in the page (session cookie and `localStorage`). Login and session-security specs use `testNoAuth` and stay signed out.
 
 ```bash
-obscura serve --port 9222
-# optional: OBSCURA_CDP_URL / OBSCURA_CDP_TOKEN in .env
-
 npm run test:obscura
 npm run test:obscura:smoke
-npm run test:obscura -- tests/cart.spec.ts --grep @TC09
+npm run test:obscura:sanity
+npm run test:obscura:regression
+npm run test:obscura:e2e
+npm run test:obscura:login
+npm run test:obscura:session-security
+npm run test:obscura -- tests/cart.spec.ts --grep "@TC09"
 ```
 
 ## Projects
 
-| Project                                               | Role                                                                |
-| ----------------------------------------------------- | ------------------------------------------------------------------- |
-| `setup`                                               | Writes `.auth/user.json` via `tests/auth.setup.ts`                  |
-| `chromium` / `firefox` / `webkit` / `edge` / `chrome` | Full suite; login/session-security use `testNoAuth` (empty storage) |
-| `obscura`                                             | Opt-in CDP headless via `connectOverCDP`                            |
+| Project                                               | Role                                                                 |
+| ----------------------------------------------------- | -------------------------------------------------------------------- |
+| `setup`                                               | Writes `.auth/user.json` via `tests/auth.setup.ts`                   |
+| `chromium` / `firefox` / `webkit` / `edge` / `chrome` | Full suite; login/session-security use `testNoAuth` (empty storage)  |
+| `obscura`                                             | Opt-in CDP browser. `npm run test:obscura*` starts it, then stops it |
 
 Unauthenticated specs import `testNoAuth` from `fixtures/test-fixtures.ts` so they clear project `storageState` without a separate Playwright project.
 
@@ -142,3 +167,4 @@ npm run format         # Prettier write — formats the repo in place
 - `reporters/` – console + custom HTML reporters
 - `scripts/report/` – custom HTML report generator
 - `scripts/run-with-report.mjs` – test + report orchestration
+- `scripts/start-obscura.mjs` – downloads Obscura for this OS, starts it, runs the test command, then stops it
