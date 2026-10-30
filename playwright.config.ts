@@ -12,15 +12,13 @@ const DEFAULT_BASE_URL = 'https://www.saucedemo.com';
 
 /**
  * Shared settings for every browser project that depends on auth setup.
- * SauceDemo session cookies are portable across Chromium, Firefox, and WebKit,
- * so all branded and bundled browsers reuse `.auth/user.json` from the setup project.
+ * Session storage is applied in `fixtures/test-fixtures.ts` via `page` overrides
+ * (`test` loads `.auth/user.json`; `testNoAuth` opens a signed-out context).
  *
  * Specs that must start signed out (login, session-security) import `testNoAuth`
- * from fixtures instead of needing a separate Playwright project.
+ * instead of needing a separate Playwright project.
  */
-const authenticatedBrowserUse = {
-  storageState: '.auth/user.json'
-} as const;
+const authenticatedBrowserUse = {} as const;
 
 /** Setup-only file; regular browser projects must not pick it up as a suite. */
 const regularSuiteIgnore = [/auth\.setup\.ts/];
@@ -115,8 +113,8 @@ if (obscuraRun) {
  * part of the default multi-browser matrix. Connect with `connectOverCDP` via fixtures.
  *
  * The `setup` project runs `tests/auth.setup.ts` once (bundled Chromium) and
- * writes `.auth/user.json`. Login and session-security specs use `testNoAuth`
- * (empty storage state) so they start signed out inside the same browser projects.
+ * writes `.auth/user.json`. Authenticated specs use fixtures `test` (page with
+ * storage); login and session-security use `testNoAuth` (page without storage).
  *
  * Reporting: JSON (custom HTML input) + list + console summary.
  * The custom HTML report is generated after the run by `scripts/run-with-report.mjs`.

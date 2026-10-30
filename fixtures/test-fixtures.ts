@@ -1,4 +1,5 @@
-import { test as base, expect, type Browser, type PlaywrightWorkerArgs } from '@playwright/test';
+import path from 'node:path';
+import { test as base, expect, type Browser, type Page, type PlaywrightWorkerArgs } from '@playwright/test';
 import {
   enableObscuraRun,
   isObscuraRunEnabled,
@@ -21,8 +22,8 @@ type ObscuraWorkerFixtures = {
   browser: Browser;
 };
 
-/** Empty storage so unauthenticated specs ignore project-level `.auth/user.json`. */
-const emptyStorageState = { cookies: [], origins: [] };
+/** Matches `storageState` path written by `tests/auth.setup.ts`. */
+const authStorageStatePath = path.resolve(__dirname, '..', '.auth', 'user.json');
 
 // Workers inherit RUN_OBSCURA from the config/orchestrator; also honor CLI when present.
 if (isObscuraRunEnabled()) {
@@ -61,46 +62,73 @@ async function connectObscuraBrowser(
 }
 
 /**
- * Authenticated fixtures. On Obscura runs, the worker browser is CDP-connected;
- * otherwise Playwright launches the project browser as usual.
+ * Opens a page in a fresh browser context, optionally with saved auth storage.
+ * @param browser - Browser used to open the context.
+ * @param baseURL - Playwright base URL for relative navigation.
+ * @param storageState - Path to auth storage, or `undefined` for a signed-out session.
+ * @param use - Fixture callback that receives the page.
+ */
+async function usePage(
+  browser: Browser,
+  baseURL: string | undefined,
+  storageState: string | undefined,
+  use: (page: Page) => Promise<void>
+): Promise<void> {
+  const context = await browser.newContext({
+    baseURL,
+    ...(storageState ? { storageState } : {})
+  });
+  const page = await context.newPage();
+  try {
+    await use(page);
+  } finally {
+    await context.close();
+  }
+}
+
+const pageObjectFixtures: Parameters<typeof base.extend<TestFixtures>>[0] = {
+  loginPage: async ({ page }, use) => {
+    await use(new LoginPage(page));
+  },
+  productsPage: async ({ page }, use) => {
+    await use(new ProductsPage(page));
+  },
+  cartPage: async ({ page }, use) => {
+    await use(new CartPage(page));
+  },
+  checkoutPage: async ({ page }, use) => {
+    await use(new CheckoutPage(page));
+  }
+};
+
+/**
+ * Authenticated fixtures. Overrides `page` with `.auth/user.json` storage state.
+ * On Obscura runs, the worker browser is CDP-connected; otherwise Playwright
+ * launches the project browser as usual.
  */
 export const test = isObscuraRunEnabled()
   ? base.extend<TestFixtures, ObscuraWorkerFixtures>({
       browser: [connectObscuraBrowser, { scope: 'worker' }],
-      loginPage: async ({ page }, use) => {
-        await use(new LoginPage(page));
+      page: async ({ browser, baseURL }, use) => {
+        await usePage(browser, baseURL, authStorageStatePath, use);
       },
-      productsPage: async ({ page }, use) => {
-        await use(new ProductsPage(page));
-      },
-      cartPage: async ({ page }, use) => {
-        await use(new CartPage(page));
-      },
-      checkoutPage: async ({ page }, use) => {
-        await use(new CheckoutPage(page));
-      }
+      ...pageObjectFixtures
     })
   : base.extend<TestFixtures>({
-      loginPage: async ({ page }, use) => {
-        await use(new LoginPage(page));
+      page: async ({ browser, baseURL }, use) => {
+        await usePage(browser, baseURL, authStorageStatePath, use);
       },
-      productsPage: async ({ page }, use) => {
-        await use(new ProductsPage(page));
-      },
-      cartPage: async ({ page }, use) => {
-        await use(new CartPage(page));
-      },
-      checkoutPage: async ({ page }, use) => {
-        await use(new CheckoutPage(page));
-      }
+      ...pageObjectFixtures
     });
 
 /**
- * Same page-object fixtures as `test`, but without auth storage state.
- * Used by login and session-security specs inside the same browser projects.
+ * Same page-object fixtures as `test`, but overrides `page` without storage state
+ * so login and session-security specs start signed out.
  */
-export const testNoAuth = test.extend({});
-
-testNoAuth.use({ storageState: emptyStorageState });
+export const testNoAuth = test.extend({
+  page: async ({ browser, baseURL }, use) => {
+    await usePage(browser, baseURL, undefined, use);
+  }
+});
 
 export { expect };
