@@ -7,5 +7,8 @@
     "username": "locked_out_user",
     "password": "secret_sauce"
   },
-  "invalidPassword": "testing_invalid_password"
+  "invalidPassword": "testing_invalid_password",
+  "obscura": {
+    "token": "52ff1bd615dd9c290c33de68f067799917444c70ebde0366312c14eef5acc76d"
+  }
 }

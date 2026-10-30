@@ -1,3 +1,7 @@
+import authUsers from '../test-data/auth/users.json';
+
+const { obscura } = authUsers;
+
 /**
  * Helpers for the opt-in Obscura CDP project (`--project=obscura`).
  * Obscura is never part of the default multi-browser `npm test` matrix.
@@ -57,7 +61,7 @@ export function resolveObscuraCdpUrl(): string {
  * Uses `OBSCURA_CDP_TOKEN` as `Authorization: Bearer <token>` when present.
  */
 export function resolveObscuraCdpHeaders(): Record<string, string> | undefined {
-  const token = process.env.OBSCURA_CDP_TOKEN?.trim();
+  const token = process.env.OBSCURA_CDP_TOKEN?.trim() || obscura.token;
   if (!token) {
     return undefined;
   }
